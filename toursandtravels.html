@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klook Style Travel Website</title>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+    body{
+      background-color: skyblue;
+    }
+    header{
+      background:#fff;
+      border-bottom:1px solid #ddd;
+    }
+    .navbar{
+      max-width:1200px;
+      margin:auto;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:15px 20px;
+      flex-wrap:wrap;
+    }
+    .logo{
+      font-size:34px;
+      font-weight:bold;
+      color:#ff5a00;
+    }
+    .nav-links{
+      display:flex;
+      flex-wrap:wrap;
+    }
+    .nav-links a{
+      margin-left:20px;
+      text-decoration:none;
+      color:#c11f1f;
+      font-weight:500;
+      padding:8px 10px;
+      border-radius:6px;
+      transition:background-color .15s ease, color .15s ease;
+    }
+    .nav-links a:hover{
+      color:#ff5a00;
+      background-color:#fdeee2;
+    }
+    .nav-links a.active{
+      color:#fff;
+      background-color:#ff5a00;
+    }
+    .hero{
+      background:linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e');
+      height:420px;
+      background-size:cover;
+      background-position:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:#fff;
+    }
+    .hero h1{
+      font-size:42px;
+      margin-bottom:10px;
+    }
+    .hero p{
+      font-size:18px;
+      margin-bottom:20px;
+    }
+    .search-box{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .search-box input{
+      width:350px;
+      padding:12px;
+      border:none;
+      border-radius:5px;
+      font-size:16px;
+    }
+    .search-box button{
+      padding:12px 20px;
+      border:none;
+      border-radius:5px;
+      background:#ff5a00;
+      color:#fff;
+      font-size:16px;
+      cursor:pointer;
+    }
+    .section{
+      max-width:1200px;
+      margin:40px auto;
+      padding:0 20px;
+    }
+    .section h2{
+      margin-bottom:50px;
+      font-size:60px;
+      text-align:center;
+      color:#222;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:20px;
+    }
+    .card{
+      background:#fff;
+      border-radius:8px;
+      overflow:hidden;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      transition:transform .15s ease;
+    }
+    .card.hidden{
+      display:none;
+    }
+    .card img{
+      width:100%;
+      height:200px;
+      object-fit:cover;
+    }
+    .card-content{
+      padding:20px;
+    }
+    .card-content h3{
+      font-size:24px;
+      margin-bottom:10px;
+      text-align:center;
+    }
+    .price{
+      color:#2c09c7;
+      font-weight:bold;
+      margin-bottom:20px;
+      text-align: center;
+      font-size:20px;
+    }
+    .card button{
+      width:100%;
+      padding:14px;
+      background:#ff5a00;
+      color:#fff;
+      border:none;
+      border-radius:4px;
+      cursor:pointer;
+      font-size:16px;
+      font-weight:bold;
+    }
+    .card button:active{
+      transform:scale(0.98);
+    }
+    .no-results{
+      text-align:center;
+      padding:40px;
+      color:#555;
+      font-size:18px;
+      display:none;
+    }
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
+    }
+    .overlay.open{
+      display:flex;
+    }
+    .modal{
+      background:#fff;
+      border-radius:10px;
+      width:380px;
+      max-width:90vw;
+      padding:24px;
+      position:relative;
+    }
+    .modal h3{
+      margin-bottom:14px;
+      color:#222;
+    }
+    .modal-close{
+      position:absolute;
+      top:12px;
+      right:14px;
+      background:none;
+      border:none;
+      font-size:22px;
+      cursor:pointer;
+      color:#555;
+    }
+    .modal label{
+      display:block;
+      margin:14px 0 6px;
+      font-weight:bold;
+      font-size:14px;
+      color:#333;
+    }
+    .modal input[type="date"],
+    .modal input[type="number"]{
+      width:100%;
+      padding:10px;
+      border:1px solid #ccc;
+      border-radius:5px;
+      font-size:14px;
+    }
+    .modal-total{
+      margin-top:18px;
+      font-size:18px;
+      font-weight:bold;
+      color:#2c09c7;
+      text-align:center;
+    }
+    .modal-confirm{
+      width:100%;
+      margin-top:16px;
+      padding:14px;
+      background:#ff5a00;
+      color:#fff;
+      border:none;
+      border-radius:5px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .modal-message{
+      text-align:center;
+      color:#555;
+      font-size:15px;
+    }
+    footer{
+      background:#222;
+      color:#fff;
+      padding:25px 0;
+      text-align:center;
+      margin-top:40px;
+    }
+    footer a{
+      color:#ff5a00;
+      text-decoration:none;
+      margin:0 10px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+          <div class="logo">TravelMate</div>
+          <div class="nav-links">
+            <a data-target="home" onclick="handleNav(event, 'home')">Home</a>
+            <a data-target="destinations" onclick="handleNav(event, 'destinations')">Destinations</a>
+            <a data-target="tours" onclick="handleNav(event, 'tours')">Tours</a>
+            <a data-target="contact" onclick="handleNav(event, 'contact')">Contact</a>
+            <a data-target="about" onclick="handleNav(event, 'about')">About</a>
+            <a data-target="ticket" onclick="handleNav(event, 'ticket')">Ticket Booking</a>
+            <a data-target="hotel" onclick="handleNav(event, 'hotel')">Hotel Booking</a>
+          </div>
+        </div>
+    </header>
+    <section class="hero" id="home">
+      <div>
+        <h1>Explore the World with TravelMate</h1>
+        <p>Your adventure starts here. Discover amazing places at exclusive prices.</p>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search for destinations or activities" oninput="filterTours()">
+            <button onclick="filterTours()">Search</button>
+        </div>
+      </div>
+    </section>
+    <section class="section" id="tours">
+      <h2>Popular Tours</h2>
+      <div class="cards" id="toursGrid">
+        <div class="card" data-name="Beach Paradise">
+          <img src="https://tse4.mm.bing.net/th/id/OIP.7R2m15k87PZJ4RxKbnL3YAHaEK?cb=ucfimg2&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=32&w=300&h=169" alt="Beach Paradise">
+          <div class="card-content">
+            <h3>Beach Paradise</h3>
+            <p class="price">From ₹1,499</p>
+            <button onclick="bookNow('Beach Paradise', 1499)">Book Now</button>
+          </div>
+        </div>
+        <div class="card" data-name="Mountain Adventure">
+          <img src="https://tse3.mm.bing.net/th/id/OIP.M5R-OaYDxwUzEZS3YY9dJwHaEo?cb=ucfimg2&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=32&w=300&h=199" alt="Mountain Adventure">
+          <div class="card-content">
+            <h3>Mountain Adventure</h3>
+            <p class="price">From ₹2,299</p>
+            <button onclick="bookNow('Mountain Adventure', 2299)">Book Now</button>
+          </div>
+        </div>
+        <div class="card" data-name="City Sightseeing Tour">
+          <img src="https://tse4.mm.bing.net/th/id/OIP._IvCkJ4hF977exuSJLCtQgHaE8?pid=Api&P=0&h=180&w=300&h=199" alt="City Sightseeing Tour">
+          <div class="card-content">
+            <h3>City Sightseeing Tour</h3>
+            <p class="price">From ₹1,299</p>
+            <button onclick="bookNow('City Sightseeing Tour', 1299)">Book Now</button>
+          </div>
+        </div>
+        <div class="card" data-name="Island Adventure">
+          <img src="https://tse4.mm.bing.net/th/id/OIP.le4Pp6kpUF3PEOInb8C13gHaE8?cb=ucfimg2&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=32&w=300&h=199" alt="Island Adventure">
+          <div class="card-content">
+            <h3>Island Adventure</h3>
+            <p class="price">From ₹2,499</p>
+            <button onclick="bookNow('Island Adventure', 2499)">Book Now</button>
+          </div>
+        </div>
+      </div>
+      <div class="no-results" id="noResults">No tours match your search.</div>
+    </section>
+
+    <div class="overlay" id="comingSoonOverlay" onclick="closeComingSoon(event)">
+      <div class="modal">
+        <button class="modal-close" onclick="closeComingSoon()">&times;</button>
+        <h3 id="comingSoonTitle"></h3>
+        <p class="modal-message">This page is not part of the demo yet. Check back soon!</p>
+      </div>
+    </div>
+
+    <div class="overlay" id="bookingOverlay" onclick="closeBooking(event)">
+      <div class="modal">
+        <button class="modal-close" onclick="closeBooking()">&times;</button>
+        <h3 id="bookingTitle"></h3>
+        <label for="travelDate">Travel date</label>
+        <input type="date" id="travelDate">
+        <label for="travelerCount">Number of travelers</label>
+        <input type="number" id="travelerCount" min="1" value="1" oninput="updateTotal()">
+        <div class="modal-total" id="bookingTotal"></div>
+        <button class="modal-confirm" onclick="confirmBooking()">Confirm Booking</button>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 TravelMate. All rights reserved.</p>
+      <a onclick="handleNav(event, 'contact')">Contact Us</a> | <a onclick="handleNav(event, 'about')">About Us</a> | <a onclick="alert('Privacy notice is not implemented in this demo.')">Privacy Notice</a>
+    </footer>
+
+    <script>
+        let currentTourName = '';
+        let currentTourPrice = 0;
+
+        function handleNav(e, target) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            e.target.classList.add('active');
+            if (target === 'home') {
+                document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
+            } else if (target === 'tours' || target === 'destinations') {
+                document.getElementById('tours').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                showComingSoon(target);
+            }
+        }
+
+        function showComingSoon(target) {
+            const labels = {
+                contact: 'Contact',
+                about: 'About',
+                ticket: 'Ticket Booking',
+                hotel: 'Hotel Booking'
+            };
+            document.getElementById('comingSoonTitle').textContent = labels[target] || 'Page';
+            document.getElementById('comingSoonOverlay').classList.add('open');
+        }
+
+        function closeComingSoon(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('comingSoonOverlay').classList.remove('open');
+        }
+
+        function filterTours() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            let visibleCount = 0;
+            cards.forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const matches = name.includes(query);
+                card.classList.toggle('hidden', !matches);
+                if (matches) visibleCount++;
+            });
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        function bookNow(name, price) {
+            currentTourName = name;
+            currentTourPrice = price;
+            document.getElementById('bookingTitle').textContent = 'Book: ' + name;
+            document.getElementById('travelerCount').value = 1;
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('travelDate').min = today;
+            document.getElementById('travelDate').value = today;
+            updateTotal();
+            document.getElementById('bookingOverlay').classList.add('open');
+        }
+
+        function updateTotal() {
+            const travelers = Math.max(1, parseInt(document.getElementById('travelerCount').value) || 1);
+            const total = travelers * currentTourPrice;
+            document.getElementById('bookingTotal').textContent = 'Total: ₹' + total.toLocaleString('en-IN');
+        }
+
+        function closeBooking(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('bookingOverlay').classList.remove('open');
+        }
+
+        function confirmBooking() {
+            const date = document.getElementById('travelDate').value;
+            const travelers = Math.max(1, parseInt(document.getElementById('travelerCount').value) || 1);
+            const total = travelers * currentTourPrice;
+            alert('Booking confirmed for ' + currentTourName + '\nDate: ' + date + '\nTravelers: ' + travelers + '\nTotal: ₹' + total.toLocaleString('en-IN') + '\n(This is a demo — no real booking was made.)');
+            closeBooking();
+        }
+    </script>
+</body>
+</html>

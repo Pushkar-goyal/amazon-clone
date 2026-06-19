@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Clone - Shop Online</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f3f3f3; color: #333; }
+        header { background-color: #131921; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 24px; font-weight: bold; color: #ff9900; cursor: pointer; }
+        .search-bar { display: flex; flex: 1; margin: 0 20px; max-width: 600px; }
+        .search-bar input { flex: 1; padding: 8px; border: none; border-radius: 4px 0 0 4px; }
+        .search-bar button { padding: 8px 12px; background-color: #febd69; border: none; border-radius: 0 4px 4px 0; cursor: pointer; }
+        .header-right { display: flex; align-items: center; }
+        .header-right a { color: white; text-decoration: none; margin-left: 15px; cursor: pointer; position: relative; }
+        nav { background-color: #232f3e; padding: 10px 20px; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; }
+        nav li { margin-right: 20px; }
+        nav a { color: white; text-decoration: none; cursor: pointer; }
+        .hero { background: linear-gradient(to right, #f0c14b, #ff9900); text-align: center; padding: 50px 20px; }
+        .hero h1 { margin: 0; font-size: 36px; }
+        .hero p { font-size: 18px; }
+        .products { display: flex; flex-wrap: wrap; justify-content: space-around; padding: 20px; }
+        .product { background: white; margin: 10px; padding: 15px; width: 250px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 5px; transition: transform 0.15s ease; }
+        .product.hidden { display: none; }
+        .product img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; }
+        .product h3 { font-size: 16px; margin: 10px 0; }
+        .product p { color: #b12704; font-weight: bold; }
+        .product button { background-color: #ff9900; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
+        .product button:active { transform: scale(0.97); }
+        .product button.added { background-color: #2e7d32; }
+        footer { background-color: #131921; color: white; text-align: center; padding: 20px; }
+        footer a { color: #ff9900; text-decoration: none; margin: 0 10px; }
+        .no-results { width: 100%; text-align: center; padding: 40px; color: #777; font-size: 16px; display: none; }
+
+        /* Cart badge */
+        .cart-badge { background: #ff9900; color: #111; font-size: 11px; font-weight: bold; border-radius: 50%; padding: 1px 6px; position: absolute; top: -8px; right: -10px; min-width: 16px; text-align: center; }
+
+        /* Cart drawer */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 50; }
+        .overlay.open { display: block; }
+        .cart-drawer { position: fixed; top: 0; right: -380px; width: 360px; max-width: 90vw; height: 100%; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); z-index: 60; transition: right 0.25s ease; display: flex; flex-direction: column; }
+        .cart-drawer.open { right: 0; }
+        .cart-header { padding: 16px; background: #131921; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .cart-header h2 { margin: 0; font-size: 18px; }
+        .cart-close { background: none; border: none; color: white; font-size: 22px; cursor: pointer; line-height: 1; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 10px 16px; }
+        .cart-empty { text-align: center; color: #888; padding: 40px 10px; }
+        .cart-item { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .cart-item img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; }
+        .cart-item-info { flex: 1; }
+        .cart-item-info h4 { margin: 0 0 4px; font-size: 14px; }
+        .cart-item-info .price { color: #b12704; font-weight: bold; font-size: 13px; }
+        .qty-controls { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+        .qty-controls button { width: 22px; height: 22px; border: 1px solid #ccc; background: #f7f7f7; border-radius: 4px; cursor: pointer; line-height: 1; }
+        .remove-btn { background: none; border: none; color: #999; cursor: pointer; font-size: 18px; align-self: flex-start; }
+        .remove-btn:hover { color: #c00; }
+        .cart-footer { padding: 16px; border-top: 1px solid #eee; }
+        .cart-total { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-bottom: 12px; }
+        .checkout-btn { width: 100%; background: #ff9900; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .checkout-btn:disabled { background: #ddd; cursor: not-allowed; }
+
+        @media (max-width: 768px) { .products { flex-direction: column; align-items: center; } .product { width: 90%; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="resetSearch()">Amazon Clone</div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search for products, brands and more" oninput="filterProducts()">
+            <button onclick="filterProducts()">🔍</button>
+        </div>
+        <div class="header-right">
+            <a onclick="alert('Sign-in is not implemented in this demo.')">Hello, Sign in</a>
+            <a onclick="alert('Account page is not implemented in this demo.')">Your Account</a>
+            <a onclick="alert('No orders yet.')">Returns & Orders</a>
+            <a onclick="toggleCart(true)">Cart (<span id="cartCount">0</span>)</a>
+        </div>
+    </header>
+    <nav>
+        <ul>
+            <li><a onclick="resetSearch()">All</a></li>
+            <li><a onclick="alert('No deals right now — check back soon!')">Today's Deals</a></li>
+            <li><a onclick="alert('Customer service is not implemented in this demo.')">Customer Service</a></li>
+            <li><a onclick="alert('Registry is not implemented in this demo.')">Registry</a></li>
+            <li><a onclick="alert('Gift cards are not implemented in this demo.')">Gift Cards</a></li>
+            <li><a onclick="alert('Selling tools are not implemented in this demo.')">Sell</a></li>
+            <li><a onclick="alert('Amazon Pay is not implemented in this demo.')">Amazon Pay</a></li>
+        </ul>
+    </nav>
+    <section class="hero">
+        <h1>Welcome to Amazon Clone</h1>
+        <p>Shop millions of products with fast delivery. Great deals on electronics, fashion, home & more!</p>
+        <button style="background-color: #232f3e; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer;" onclick="document.querySelector('.products').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+    </section>
+    <section class="products" id="productsGrid">
+        <div class="product" data-id="1" data-name="Latest Smartphone" data-price="19999">
+            <img src="https://th.bing.com/th/id/OIP.IGNctRxD9xM6Va3MH2TPjAHaHa?w=168&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Smartphone">
+            <h3>Latest Smartphone</h3>
+            <p>₹19,999</p>
+            <button onclick="addToCart(this, '1','Latest Smartphone',19999,'z)">Add to Cart</button>
+        </div>
+        <div class="product" data-id="2" data-name="Gaming Laptop" data-price="79999">
+            <img src="https://th.bing.com/th/id/OIP.pyltM7-A4FzwBc44BB5q_wHaE6?w=241&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Laptop">
+            <h3>Gaming Laptop</h3>
+            <p>₹79,999</p>
+            <button onclick="addToCart(this, '2','Gaming Laptop',79999,'https://via.placeholder.com/250x200?text=Laptop')">Add to Cart</button>
+        </div>
+        <div class="product" data-id="3" data-name="Wireless Headphones" data-price="4999">
+            <img src="https://th.bing.com/th/id/OIP.HCX3x-zsLTSkIIp9gKQ8EwHaHa?w=195&h=195&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Headphones">
+            <h3>Wireless Headphones</h3>
+            <p>₹4,999</p>
+            <button onclick="addToCart(this, '3','Wireless Headphones',4999,'https://via.placeholder.com/250x200?text=Headphones')">Add to Cart</button>
+        </div>
+        <div class="product" data-id="4" data-name="Bestseller Book" data-price="499">
+            <img src="https://th.bing.com/th/id/OIP.wqNPVNjWrP27NjEJigE9xAHaFG?w=274&h=189&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Book">
+            <h3>Bestseller Book</h3>
+            <p>₹499</p>
+            <button onclick="addToCart(this, '4','Bestseller Book',499,'https://via.placeholder.com/250x200?text=Book')">Add to Cart</button>
+        </div>
+        <div class="product" data-id="5" data-name="Sports Shoes" data-price="2999">
+            <img src="https://th.bing.com/th/id/OIP.hx9wjfaWX09DYgmVb9F3SwHaHa?w=208&h=208&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Shoes">
+            <h3>Sports Shoes</h3>
+            <p>₹2,999</p>
+            <button onclick="addToCart(this, '5','Sports Shoes',2999,'https://via.placeholder.com/250x200?text=Shoes')">Add to Cart</button>
+        </div>
+        <div class="product" data-id="6" data-name="Smart TV" data-price="39999">
+            <img src="https://th.bing.com/th/id/OIP.xplh1HD78B5Migk9Dp9WUQHaE6?w=207&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="TV">
+            <h3>Smart TV</h3>
+            <p>₹39,999</p>
+            <button onclick="addToCart(this, '6','Smart TV',39999,'https://via.placeholder.com/250x200?text=TV')">Add to Cart</button>
+        </div>
+        <div class="no-results" id="noResults">No products match your search.</div>
+    </section>
+    <footer>
+        <p>&copy; 2026 Amazon Clone. All rights reserved.</p>
+        <a href="#">Conditions of Use</a> | <a href="#">Privacy Notice</a> | <a href="#">Interest-Based Ads</a>
+    </footer>
+
+    <!-- Cart Drawer -->
+    <div class="overlay" id="overlay" onclick="toggleCart(false)"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button class="cart-close" onclick="toggleCart(false)">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Subtotal</span><span id="cartTotal">₹0</span></div>
+            <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        // cart state: { id: { id, name, price, image, qty } }
+        let cart = {};
+
+        function formatINR(amount) {
+            return '₹' + amount.toLocaleString('en-IN');
+        }
+
+        function addToCart(btn, id, name, price, image) {
+            if (cart[id]) {
+                cart[id].qty += 1;
+            } else {
+                cart[id] = { id, name, price, image, qty: 1 };
+            }
+            renderCart();
+            flashAdded(btn);
+        }
+
+        function flashAdded(btn) {
+            const original = btn.textContent;
+            btn.textContent = 'Added ✓';
+            btn.classList.add('added');
+            setTimeout(() => {
+                btn.textContent = original;
+                btn.classList.remove('added');
+            }, 900);
+        }
+
+        function changeQty(id, delta) {
+            if (!cart[id]) return;
+            cart[id].qty += delta;
+            if (cart[id].qty <= 0) delete cart[id];
+            renderCart();
+        }
+
+        function removeFromCart(id) {
+            delete cart[id];
+            renderCart();
+        }
+
+        function renderCart() {
+            const items = Object.values(cart);
+            const countEl = document.getElementById('cartCount');
+            const totalCount = items.reduce((sum, i) => sum + i.qty, 0);
+            countEl.textContent = totalCount;
+
+            const container = document.getElementById('cartItems');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+
+            if (items.length === 0) {
+                container.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
+                checkoutBtn.disabled = true;
+            } else {
+                container.innerHTML = items.map(item => `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <div class="price">${formatINR(item.price)}</div>
+                            <div class="qty-controls">
+                                <button onclick="changeQty('${item.id}', -1)">−</button>
+                                <span>${item.qty}</span>
+                                <button onclick="changeQty('${item.id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromCart('${item.id}')" title="Remove">&times;</button>
+                    </div>
+                `).join('');
+                checkoutBtn.disabled = false;
+            }
+
+            const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+            document.getElementById('cartTotal').textContent = formatINR(total);
+        }
+
+        function toggleCart(open) {
+            document.getElementById('cartDrawer').classList.toggle('open', open);
+            document.getElementById('overlay').classList.toggle('open', open);
+        }
+
+        function checkout() {
+            const items = Object.values(cart);
+            if (items.length === 0) return;
+            const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+            alert(`Order placed! Total: ${formatINR(total)}\n(This is a demo — no real payment was processed.)`);
+            cart = {};
+            renderCart();
+            toggleCart(false);
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const products = document.querySelectorAll('.product');
+            let visibleCount = 0;
+            products.forEach(p => {
+                const name = p.dataset.name.toLowerCase();
+                const matches = name.includes(query);
+                p.classList.toggle('hidden', !matches);
+                if (matches) visibleCount++;
+            });
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            filterProducts();
+        }
+
+        // initial render
+        renderCart();
+    </script>
+</body>
+</html>
